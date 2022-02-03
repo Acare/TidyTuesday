@@ -56,7 +56,7 @@ breed_rank_tidy |>
     annotate(geom = "curve", x = 2016, y = 11, xend = 2014.6, yend = 7.1,
              curvature = -0.3, arrow = arrow(length = unit(2, "mm"))) +
     annotate(geom = "text", x = 2016.1, y = 11, hjust = "left",
-             label = "What happened here???") +
+             label = "The end begins for Yorkies...") +
     paletteer::scale_color_paletteer_d("wesanderson::IsleofDogs1") +
     paletteer::scale_fill_paletteer_d("wesanderson::IsleofDogs1") +
     scale_x_continuous(expand = expansion(mult = c(0.1, 0.3)),
@@ -65,7 +65,7 @@ breed_rank_tidy |>
                        breaks = 1:20, labels = str_c("#", 1:20)) +
     labs(x = NULL, y = NULL, color = NULL,
          title = "Ranking of Most Popular<sup>*</sup> Dog Breeds from 2013 to 2020",
-         subtitle = "Will French Bulldogs dethrone Labradors next year? Why are Yorkshires becoming so unpopular?",
+         subtitle = "Will French Bulldogs dethrone Labradors next year? Why are Yorkies becoming so unpopular?",
          caption = "* Only breeds with at least a median rank of 10 are displayed.") +
     theme(axis.text.x = element_text(vjust = 1, hjust = 1),
           panel.grid.minor.x = element_blank(),
