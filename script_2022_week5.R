@@ -20,7 +20,9 @@ breeds_to_highlight <- c("Retrievers (Labrador)",
 breed_rank_hl <- breed_rank_tidy |> 
     filter(median_rank <= 10, breed %in% breeds_to_highlight)
 
-# Ranking of the top 9 most popular dog breeds over time
+
+# Ranking of the top 9 most popular dog breeds over time ------------------
+
 breed_rank_tidy |> 
     filter(median_rank <= 10) |> 
     ggplot(aes(year, rank)) +
@@ -75,3 +77,62 @@ breed_rank_tidy |>
           plot.title = ggtext::element_markdown(size = 20, face = "bold"),
           plot.subtitle = element_text(face = "italic"),
           plot.background = element_rect(fill = "#fcfce8"))
+
+
+# Breed traits ------------------------------------------------------------
+
+trait_desc <- trait_description |> 
+    janitor::clean_names() |> 
+    filter(trait %in% c("Barking Level", 
+                        "Coat Grooming Frequency", 
+                        "Drooling Level", 
+                        "Shedding Level", 
+                        "Watchdog/Protective Nature")) |> 
+    mutate(breed = "French Bulldogs", 
+           point = -1,
+           description = str_wrap(description, width = 50))
+
+breed_traits_tidy <- breed_traits |> 
+    rename(breed = Breed) |> 
+    mutate(across(-breed, as.character),
+           breed = str_replace_all(breed, "[^[:graph:]]", " ")) |> 
+    pivot_longer(-breed, names_to = "trait", values_to = "point") 
+
+breed_traits_tidy |> 
+    filter(!trait %in% c("Coat Type", "Coat Length")) |> 
+    mutate(point = as.integer(point)) |> 
+    filter(breed %in% breeds_to_highlight) |> 
+    group_by(trait) |> 
+    mutate(are_pts_equal = ifelse(length(unique(point)) == 1, TRUE, FALSE)) |> 
+    ungroup() |> 
+    filter(are_pts_equal == FALSE) |> 
+    ggplot(aes(breed, point, fill = breed)) +
+    geom_col(alpha = 0.7, color = "grey50", size = 0.1) +
+    geom_text(aes(label = point), color = "white", vjust = 2,
+              family = "Serif", fontface = "bold") +
+    geom_text(aes(label = description), size = 2, data = trait_desc,
+              position = position_nudge(x = -0.5, y = 0.5),
+              hjust = 0, vjust = 1, 
+              family = "Serif") +
+    facet_wrap(facets = vars(trait), ncol = 5) +
+    paletteer::scale_fill_paletteer_d("wesanderson::IsleofDogs1") +
+    ylim(-3, 5) +
+    labs(x = NULL, y = NULL, fill = NULL,
+         title = "A Selection<sup>*</sup> of _Traits_ for French Bulldogs, Labradors and Yorkies",
+         subtitle = paste("Labradors excel in Energy, Goodness with other dogs, Playfulness and Trainability.",
+                          "Traits presenting a description are more discriminative for French Bulldogs and Yorkies.",
+                          sep = "\n"),
+         caption = "* Only traits which vary among the three breeds are displayed.") +
+    theme(panel.grid = element_blank(),
+          panel.spacing = unit(1.5, "lines"),
+          axis.text = element_blank(),
+          legend.position = "top",
+          plot.title = ggtext::element_markdown(size = 20, face = "bold"),
+          plot.background = element_rect(fill = "#fcfce8"),
+          strip.text = element_text(size = 10, color = "#D9D0D3"),
+          strip.background = element_rect(fill = "#0F0D0E", color = "#8D8680"))
+
+
+# Difference in ranks -----------------------------------------------------
+
+
